@@ -21,7 +21,8 @@ print(torch.cuda.is_available())  # Should return True if GPU is available
 
 ## **Project Structure**
 
-```Deepfake-Detection/
+```
+Deepfake-Detection/
 ├── data/
 │   ├── videos/                  # Raw video files (real & fake videos)
 │   │   ├── real/
@@ -64,26 +65,44 @@ print(torch.cuda.is_available())  # Should return True if GPU is available
 
 Before training, you need to extract **frames** and **faces** from videos.
 
-### **1. Extract Frames from Videos**
+### **1. Organize Raw Videos with Labels**
 
-- Place your videos inside `data/videos/`.
+- Store raw videos inside `data/videos/`.
+- Create two separate subfolders:
+  ```
+  data/videos/
+  ├── real/
+  │   ├── real_video_1.mp4
+  │   ├── real_video_2.mp4
+  │   └── ...
+  ├── fake/
+  │   ├── fake_video_1.mp4
+  │   ├── fake_video_2.mp4
+  │   └── ...
+  ```
+- Ensure the **real** videos contain genuine content, while **fake** videos are deepfake-generated.
+
+### **2. Extract Frames from Videos**
+
 - Extract frames using:
 
 ```bash
-python extract_frames.py --input data/videos/video.mp4 --output data/extracted_frames/
+python extract_frames.py --input data/videos/real/video.mp4 --output data/extracted_frames/real/
+python extract_frames.py --input data/videos/fake/video.mp4 --output data/extracted_frames/fake/
 ```
 
-- Extracted frames will be stored in `data/extracted_frames/`.
+- Extracted frames will be stored in corresponding real and fake folders.
 
-### **2. Extract Faces from Frames**
+### **3. Extract Faces from Frames**
 
 - Detect and crop faces from frames:
 
 ```bash
-python extract_faces.py --input data/extracted_frames/ --output data/extracted_faces/
+python extract_faces.py --input data/extracted_frames/real/ --output data/extracted_faces/real/
+python extract_faces.py --input data/extracted_frames/fake/ --output data/extracted_faces/fake/
 ```
 
-- Cropped faces will be saved in `data/extracted_faces/`.
+- Cropped faces will be saved in respective real and fake folders.
 
 ---
 
@@ -159,44 +178,5 @@ models/lstm_model_custom.pth
 
 ---
 
-## **Step 5: Test Deepfake Detection**
-
-Now, you can test the trained model on new videos.
-
-### **1. Extract Frames from a Test Video**
-
-```bash
-python extract_frames.py --input test_video.mp4 --output test_frames/
-```
-
-### **2. Extract Faces from Frames**
-
-```bash
-python extract_faces.py --input test_frames/ --output test_faces/
-```
-
-### **3. Run Deepfake Detection**
-
-```bash
-python detect.py --input test_faces/
-```
-
-- This will return **"Deepfake"** or **"Real"**.
-
----
-
-## **Troubleshooting & Notes**
-
-⚠️ **File Paths:** Ensure model files are stored correctly in `models/`.
-
-⚠️ **GPU Acceleration:** If facing memory issues, force **CPU mode** by adding:
-
-```python
-device = torch.device("cpu")
-```
-
----
-
 ### **License**
 This project is open-source and free to use.
-
