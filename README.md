@@ -61,6 +61,7 @@ Deepfake-Detection/
 ├── detect.py                    # Deepfake detection script
 ├── evaluate.py                  # Model evaluation script
 ├── README.md                    # Project documentation
+```
 ---
 
 ## **Step 3: Extract Features Using Swin Transformer**
@@ -155,14 +156,16 @@ The extracted features for the test dataset should be in:
 dataset/test_features/
 ├── real.pt     # Pre-extracted real face features
 ├── fake.pt     # Pre-extracted deepfake face features
+
+```
 ---
 
 2. Run Model Evaluation
 
 Run the evaluation script:
-``` bash
+```bash
 python evaluate.py
----
+```
 
 This will compute the model's accuracy, precision, recall, and F1-score and display the results.
 
