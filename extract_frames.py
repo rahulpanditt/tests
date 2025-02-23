@@ -16,7 +16,7 @@ def extract_frames(video_path, output_folder, frame_rate=5):
     
     os.makedirs(labeled_output_folder, exist_ok=True)
 
-    cap = cv2.VideoCapture(video_path)
+    cap = cv2.VideoCapture(video    _path)
     frame_count = 0
     success, frame = cap.read()
 
@@ -27,7 +27,7 @@ def extract_frames(video_path, output_folder, frame_rate=5):
         success, frame = cap.read()
         frame_count += 1
 
-    cap.release()
+    cap.re()
     print(f"✅ Extracted frames saved in {labeled_output_folder}")
 
 # Example Usage
