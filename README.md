@@ -7,7 +7,7 @@ This repository contains the implementation of a **Deepfake Detection Model** us
 Ensure you have Python **3.8+** installed. Then, install the required dependencies:
 
 ```bash
-pip install torch torchvision timm facenet-pytorch opencv-python pillow numpy scikit-learn
+pip install torch torchvision timm facenet-pytorch opencv-python pillow numpy
 ```
 
 ### **Check GPU Availability (Optional but Recommended)**
@@ -61,32 +61,112 @@ Deepfake-Detection/
 ├── detect.py                    # Deepfake detection script
 ├── evaluate.py                  # Model evaluation script
 ├── README.md                    # Project documentation
+---
+
+## **Step 3: Extract Features Using Swin Transformer**
+
+Extract features from the trained Swin model:
+
+```bash
+python swin_feature_extraction.py --input data/extracted_faces/ --output dataset/extracted_features/
+```
+
+- This will generate two files:
+  - `dataset/extracted_features/real.pt` → Stores all real face features.
+  - `dataset/extracted_features/fake.pt` → Stores all fake face features.
+
+---
+
+## **Step 4: Train the LSTM Model**
+
+The **LSTM model** takes extracted features and classifies faces as **real** or **deepfake**.
+
+### **1. Ensure Extracted Features Exist**
+
+`dataset/extracted_features/real.pt` and `dataset/extracted_features/fake.pt` should be available.
+
+### **2. Train the LSTM Model**
+
+Run the training script:
+
+```bash
+python train_lstm.py
+```
+
+This will train the LSTM model and save it as:
+
+```
+models/lstm_model_custom.pth
 ```
 
 ---
 
-## **Step 6: Model Evaluation**
+## **Step 5: Test and Inference**
+
+After training, you can test the model on a new video.
+
+### **1. Prepare a New Test Video**
+- Place the video inside `data/videos/test_video.mp4`.
+
+### **2. Extract Frames from the Test Video**
+```bash
+python extract_frames.py --input data/videos/test_video.mp4 --output data/test_frames/
+```
+
+### **3. Extract Faces from Frames**
+```bash
+python extract_faces.py --input data/test_frames/ --output data/test_faces/
+```
+
+### **4. Run Deepfake Detection**
+```bash
+python detect.py --input data/test_faces/
+```
+
+### **5. Get Video-Level Classification**
+- The `detect.py` script will classify each face as **"Real"** or **"Deepfake"**.
+- If the majority of detected faces are classified as **"Deepfake"**, the entire video is labeled as deepfake.
+
+Example:
+```python
+import os
+from detect import detect_deepfake
+
+test_faces_folder = "data/test_faces/"
+deepfake_count = sum(1 for face in os.listdir(test_faces_folder) if detect_deepfake(os.path.join(test_faces_folder, face)) == "Deepfake")
+total_faces = len(os.listdir(test_faces_folder))
+
+detection_ratio = deepfake_count / total_faces if total_faces > 0 else 0
+video_label = "Deepfake" if detection_ratio > 0.5 else "Real"
+print(f"Video Classification: {video_label}")
+``` 
+
+---
+Step 6: Model Evaluation
 
 To assess the performance of the trained deepfake detection model, you need to evaluate it on a labeled test dataset.
 
-### **1. Prepare a Test Dataset**
-- Ensure the test dataset contains both **real** and **deepfake** faces.
-- The extracted features for the test dataset should be in:
-  ```
-  dataset/test_features/
-  ├── real.pt     # Pre-extracted real face features
-  ├── fake.pt     # Pre-extracted deepfake face features
-  ```
+1. Prepare a Test Dataset
 
-### **2. Run Model Evaluation**
-Run the evaluation script:
-```bash
-python evaluate.py
+Ensure the test dataset contains both real and deepfake faces.
+
+The extracted features for the test dataset should be in:
 ```
-This will compute the model's **accuracy, precision, recall, and F1-score** and display the results.
-
+dataset/test_features/
+├── real.pt     # Pre-extracted real face features
+├── fake.pt     # Pre-extracted deepfake face features
 ---
+
+2. Run Model Evaluation
+
+Run the evaluation script:
+``` bash
+python evaluate.py
+---
+
+This will compute the model's accuracy, precision, recall, and F1-score and display the results.
 
 ### **License**
 This project is open-source and free to use.
+
 
