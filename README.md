@@ -19,6 +19,32 @@ print(torch.cuda.is_available())  # Should return True if GPU is available
 
 ---
 
+## **Project Structure**
+
+```
+Deepfake-Detection/
+├── data/
+│   ├── videos/                  # Raw video files
+│   ├── extracted_frames/        # Frames extracted from videos
+│   ├── extracted_faces/         # Faces extracted from frames
+│   ├── train_faces/             # Training dataset (real/fake faces)
+│   ├── test_faces/              # Testing dataset
+├── dataset/
+│   ├── extracted_features/      # Features extracted using Swin Transformer
+├── models/
+│   ├── swin_model_custom.pth    # Trained Swin Transformer model
+│   ├── lstm_model_custom.pth    # Trained LSTM model
+├── extract_frames.py            # Extract frames from video
+├── extract_faces.py             # Detect and extract faces
+├── swin_feature_extraction.py   # Feature extraction using Swin Transformer
+├── train_swim.py                # Train the Swin Transformer model
+├── train_lstm.py                # Train the LSTM model
+├── detect.py                    # Deepfake detection script
+├── README.md                    # Project documentation
+```
+
+---
+
 ## **Step 1: Prepare the Dataset**
 
 Before training, you need to extract **frames** and **faces** from videos.
@@ -158,3 +184,4 @@ device = torch.device("cpu")
 
 ### **License**
 This project is open-source and free to use.
+
