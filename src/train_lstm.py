@@ -2,24 +2,33 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
-import os
 
-# Load extracted features for LSTM
+# Load extracted features from stored `.pt` files
+real_features = torch.load("dataset/extracted_features/real.pt")
+fake_features = torch.load("dataset/extracted_features/fake.pt")
+
+# Assign labels
+real_labels = torch.zeros(real_features.shape[0], dtype=torch.long)  # 0 for real
+fake_labels = torch.ones(fake_features.shape[0], dtype=torch.long)   # 1 for fake
+
+# Combine real and fake datasets
+features = torch.cat([real_features, fake_features], dim=0)
+labels = torch.cat([real_labels, fake_labels], dim=0)
+
+# Create dataset class
 class FeatureDataset(Dataset):
-    def __init__(self, feature_folder):
-        self.feature_files = sorted(os.listdir(feature_folder))
-        self.labels = [0 if "real" in feature_folder.lower() else 1 for _ in self.feature_files]
-        self.feature_folder = feature_folder
+    def __init__(self, features, labels):
+        self.features = features
+        self.labels = labels
 
     def __len__(self):
-        return len(self.feature_files)
+        return len(self.features)
 
     def __getitem__(self, idx):
-        feature_path = os.path.join(self.feature_folder, self.feature_files[idx])
-        feature = torch.load(feature_path)
-        label = torch.tensor(self.labels[idx], dtype=torch.long)
-        return feature, label
-dataset = FeatureDataset("dataset/extracted_features/")
+        return self.features[idx], self.labels[idx]
+
+# Create DataLoader
+dataset = FeatureDataset(features, labels)
 train_loader = DataLoader(dataset, batch_size=8, shuffle=True)
 
 # Define LSTM Model
@@ -36,6 +45,7 @@ class CustomLSTM(nn.Module):
         out = self.fc(lstm_out)
         return self.softmax(out)
 
+# Initialize model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = CustomLSTM().to(device)
 criterion = nn.CrossEntropyLoss()

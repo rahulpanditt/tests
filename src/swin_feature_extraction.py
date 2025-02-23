@@ -16,20 +16,35 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-def extract_features(face_folder):
-    feature_list = []
+def extract_and_save_features(face_root_folder, feature_output_folder):
+    """
+    Extract features for real and fake faces and store them in a single file per category.
 
-    for face in sorted(os.listdir(face_folder)):
-        face_path = os.path.join(face_folder, face)
-        img = Image.open(face_path).convert("RGB")
-        img = transform(img).unsqueeze(0).to(device)
+    Parameters:
+        face_root_folder (str): Path to extracted faces (should contain 'real/' and 'fake/')
+        feature_output_folder (str): Path where extracted features will be saved
+    """
+    categories = ["real", "fake"]
+    os.makedirs(feature_output_folder, exist_ok=True)
 
-        with torch.no_grad():
-            features = swin_model.forward_features(img)
+    for category in categories:
+        face_folder = os.path.join(face_root_folder, category)
+        all_features = []
 
-        feature_list.append(features.squeeze().flatten())
+        for face in sorted(os.listdir(face_folder)):
+            face_path = os.path.join(face_folder, face)
+            img = Image.open(face_path).convert("RGB")
+            img = transform(img).unsqueeze(0).to(device)
 
-    return torch.stack(feature_list)
+            with torch.no_grad():
+                features = swin_model.forward_features(img)
+
+            feature_tensor = features.squeeze().flatten()
+            all_features.append(feature_tensor)
+
+        # Save all features of this category in a single file
+        torch.save(torch.stack(all_features), os.path.join(feature_output_folder, f"{category}.pt"))
+        print(f"✅ Features for {category} saved in {feature_output_folder}/{category}.pt")
 
 # Example Usage
-# features = extract_features("dataset/test_faces/")
+# extract_and_save_features("data/extracted_faces/", "dataset/extracted_features/")

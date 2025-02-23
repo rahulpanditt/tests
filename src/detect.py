@@ -1,37 +1,40 @@
 import os
 import torch
 from lstm_model import CustomLSTM
-from swin_feature_extraction import extract_features
 
 # Load trained LSTM model
-lstm_model = CustomLSTM()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+lstm_model = CustomLSTM().to(device)
 lstm_model.load_state_dict(torch.load("models/lstm_model_custom.pth"))
 lstm_model.eval()
 
-def detect_deepfake(face_folder):
-    features = extract_features(face_folder).unsqueeze(0)
-    
+def detect_deepfake(features_file):
+    """Returns confidence score instead of just a label"""
+    features = torch.load(features_file).unsqueeze(0).to(device)
     with torch.no_grad():
         prediction = lstm_model(features)
-        predicted_label = torch.argmax(prediction, dim=1).item()
+        confidence = torch.softmax(prediction, dim=1)[0, 1].item()  # Fake class probability
+    return confidence  # Return probability instead of label
 
-    return "Deepfake" if predicted_label == 1 else "Real"
-
-# Aggregating face-level detections for a video
-def detect_video(video_faces_folder):
-    deepfake_count = 0
+def detect_video(test_faces_folder, threshold=0.4, min_fake_frames=3):
+    """Classifies video as deepfake based on an adaptive threshold"""
+    deepfake_confidences = []
     total_faces = 0
 
-    for face in os.listdir(video_faces_folder):
-        face_path = os.path.join(video_faces_folder, face)
-        label = detect_deepfake(face_path)
-
-        if label == "Deepfake":
-            deepfake_count += 1
+    for face_feature in os.listdir(test_faces_folder):
+        face_feature_path = os.path.join(test_faces_folder, face_feature)
+        confidence = detect_deepfake(face_feature_path)
+        deepfake_confidences.append(confidence)
         total_faces += 1
 
-    detection_ratio = deepfake_count / total_faces if total_faces > 0 else 0
-    return "Deepfake" if detection_ratio > 0.5 else "Real"
+    # Compute average confidence & count of confident fake frames
+    avg_confidence = sum(deepfake_confidences) / total_faces if total_faces > 0 else 0
+    high_conf_fake_frames = sum(1 for c in deepfake_confidences if c > threshold)
+
+    # If avg confidence is high or enough fake frames are detected, classify as deepfake
+    if avg_confidence > threshold or high_conf_fake_frames >= min_fake_frames:
+        return "Deepfake"
+    return "Real"
 
 # Example Usage
-# print(detect_video("data/test_faces/"))
+# print(detect_video("dataset/test_features/"))
