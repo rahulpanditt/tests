@@ -13,7 +13,11 @@ def extract_faces(frame_folder, output_folder):
         frame_folder (str): Folder containing extracted frames.
         output_folder (str): Folder where cropped faces will be saved.
     """
-    os.makedirs(output_folder, exist_ok=True)
+    # Determine if the folder is for real or fake frames
+    label = "real" if "real" in frame_folder.lower() else "fake"
+    labeled_output_folder = os.path.join(output_folder, label)
+
+    os.makedirs(labeled_output_folder, exist_ok=True)
     
     for frame in sorted(os.listdir(frame_folder)):
         frame_path = os.path.join(frame_folder, frame)
@@ -25,9 +29,9 @@ def extract_faces(frame_folder, output_folder):
             for i, face in enumerate(faces):
                 x1, y1, x2, y2 = map(int, face)
                 face_crop = img.crop((x1, y1, x2, y2)).resize((224, 224))
-                face_crop.save(os.path.join(output_folder, f"face_{i}.jpg"))
+                face_crop.save(os.path.join(labeled_output_folder, f"face_{i}.jpg"))
     
-    print(f"✅ Faces extracted and saved in {output_folder}")
+    print(f"✅ Faces extracted and saved in {labeled_output_folder}")
 
 # Example Usage
-# extract_faces("data/extracted_frames/", "data/extracted_faces/")
+# extract_faces("data/extracted_frames/real", "data/extracted_faces/")

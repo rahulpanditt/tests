@@ -21,16 +21,31 @@ print(torch.cuda.is_available())  # Should return True if GPU is available
 
 ## **Project Structure**
 
-```
-Deepfake-Detection/
+```Deepfake-Detection/
 ├── data/
-│   ├── videos/                  # Raw video files
+│   ├── videos/                  # Raw video files (real & fake videos)
+│   │   ├── real/
+│   │   │   ├── real_video_1.mp4
+│   │   │   ├── real_video_2.mp4
+│   │   ├── fake/
+│   │   │   ├── fake_video_1.mp4
+│   │   │   ├── fake_video_2.mp4
 │   ├── extracted_frames/        # Frames extracted from videos
+│   │   ├── real/
+│   │   ├── fake/
 │   ├── extracted_faces/         # Faces extracted from frames
+│   │   ├── real/
+│   │   ├── fake/
 │   ├── train_faces/             # Training dataset (real/fake faces)
-│   ├── test_faces/              # Testing dataset
+│   │   ├── real/
+│   │   ├── fake/
+│   ├── test_faces/              # Testing dataset (real/fake faces)
+│   │   ├── real/
+│   │   ├── fake/
 ├── dataset/
 │   ├── extracted_features/      # Features extracted using Swin Transformer
+│   │   ├── real/
+│   │   ├── fake/
 ├── models/
 │   ├── swin_model_custom.pth    # Trained Swin Transformer model
 │   ├── lstm_model_custom.pth    # Trained LSTM model

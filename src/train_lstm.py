@@ -8,7 +8,7 @@ import os
 class FeatureDataset(Dataset):
     def __init__(self, feature_folder):
         self.feature_files = sorted(os.listdir(feature_folder))
-        self.labels = [0 if "real" in file else 1 for file in self.feature_files]
+        self.labels = [0 if "real" in feature_folder.lower() else 1 for _ in self.feature_files]
         self.feature_folder = feature_folder
 
     def __len__(self):
@@ -19,7 +19,6 @@ class FeatureDataset(Dataset):
         feature = torch.load(feature_path)
         label = torch.tensor(self.labels[idx], dtype=torch.long)
         return feature, label
-
 dataset = FeatureDataset("dataset/extracted_features/")
 train_loader = DataLoader(dataset, batch_size=8, shuffle=True)
 

@@ -1,3 +1,4 @@
+import os
 import torch
 from lstm_model import CustomLSTM
 from swin_feature_extraction import extract_features
@@ -16,5 +17,21 @@ def detect_deepfake(face_folder):
 
     return "Deepfake" if predicted_label == 1 else "Real"
 
+# Aggregating face-level detections for a video
+def detect_video(video_faces_folder):
+    deepfake_count = 0
+    total_faces = 0
+
+    for face in os.listdir(video_faces_folder):
+        face_path = os.path.join(video_faces_folder, face)
+        label = detect_deepfake(face_path)
+
+        if label == "Deepfake":
+            deepfake_count += 1
+        total_faces += 1
+
+    detection_ratio = deepfake_count / total_faces if total_faces > 0 else 0
+    return "Deepfake" if detection_ratio > 0.5 else "Real"
+
 # Example Usage
-# print(detect_deepfake("dataset/test_faces/"))
+# print(detect_video("data/test_faces/"))

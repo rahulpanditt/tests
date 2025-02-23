@@ -24,7 +24,13 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-dataset = datasets.ImageFolder(root="dataset/train_faces", transform=transform)
+from torchvision import datasets
+
+# Ensure faces are stored in labeled subfolders
+dataset = datasets.ImageFolder(root="data/extracted_faces", transform=transform)
+# The `ImageFolder` class automatically assigns:
+# Label 0 = real
+# Label 1 = fake
 train_loader = torch.utils.data.DataLoader(dataset, batch_size=8, shuffle=True)
 
 # Initialize model
