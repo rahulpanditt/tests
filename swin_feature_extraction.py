@@ -7,7 +7,7 @@ import os
 # Load trained Swin model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 swin_model = create_model("swin_base_patch4_window7_224", num_classes=2, pretrained=False)
-swin_model.load_state_dict(torch.load("models/swin_model_custom.pth"))
+swin_model.load_state_dict(torch.load("models/swin_model_best.pth"))
 swin_model.eval().to(device)
 
 transform = transforms.Compose([
