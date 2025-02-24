@@ -64,6 +64,71 @@ Deepfake-Detection/
 ```
 ---
 
+## **Step 1: Prepare the Dataset**
+
+Before training, you need to extract **frames** and **faces** from videos.
+
+### **1. Extract Frames from Videos**
+
+- Place your videos inside `data/videos/`.
+- Extract frames using:
+
+```bash
+python extract_frames.py --input data/videos/video.mp4 --output data/extracted_frames/
+```
+
+- Extracted frames will be stored in `data/extracted_frames/`.
+
+### **2. Extract Faces from Frames**
+
+- Detect and crop faces from frames:
+
+```bash
+python extract_faces.py --input data/extracted_frames/ --output data/extracted_faces/
+```
+
+- Cropped faces will be saved in `data/extracted_faces/`.
+
+---
+
+## **Step 2: Train the Swin Transformer Model**
+
+The **Swin Transformer** extracts features from the detected faces.
+
+### **1. Ensure Dataset is Ready**
+
+Organize `data/train_faces/` as follows:
+
+```
+data/train_faces/
+├── real/
+│   ├── face_1.jpg
+│   ├── face_2.jpg
+│   └── ...
+├── fake/
+│   ├── face_1.jpg
+│   ├── face_2.jpg
+│   └── ...
+```
+
+### **2. Train the Swin Model**
+
+Run the training script:
+
+```bash
+python train_swim.py
+```
+
+This will train the Swin Transformer and save the model weights to:
+
+```
+models/swin_model_custom.pth
+```
+
+---
+
+
+
 ## **Step 3: Extract Features Using Swin Transformer**
 
 Extract features from the trained Swin model:
