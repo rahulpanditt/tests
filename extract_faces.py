@@ -44,7 +44,8 @@ def extract_faces(frame_folder, output_folder):
             try:
                 x1, y1, x2, y2 = map(int, face)  # Convert to integer coordinates
                 face_crop = img.crop((x1, y1, x2, y2)).resize((224, 224))
-                face_path = os.path.join(labeled_output_folder, f"{frame[:-4]}_face_{i}.jpg")
+                face_path = os.path.join(labeled_output_folder, f"{frame[:-4]}_face_{i}_{label}.jpg")
+
                 face_crop.save(face_path)
                 processed_images += 1
             except Exception as e:
