@@ -1,10 +1,10 @@
 import torch
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from lstm_model import CustomLSTM
+from lstm_model import TemporalLSTM
 
 # Load trained LSTM model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-lstm_model = CustomLSTM().to(device)
+lstm_model = TemporalLSTM().to(device)
 lstm_model.load_state_dict(torch.load("models/lstm_model_custom.pth"))
 lstm_model.eval()
 

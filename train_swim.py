@@ -34,6 +34,8 @@ transform = transforms.Compose([
 # ✅ Load Dataset
 dataset = datasets.ImageFolder(root="data/extracted_faces", transform=transform)
 
+# print(dataset.class_to_idx)  {real:0 _ fake:1}
+
 # ✅ Split into Training (80%) and Validation (20%)
 train_size = int(0.8 * len(dataset))
 val_size = len(dataset) - train_size
